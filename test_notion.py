@@ -1,7 +1,8 @@
 import requests
+import os
 
-NOTION_TOKEN = "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"
-INBOX_DB_ID = "323575f982e28026a110f564087b32b6"
+NOTION_TOKEN = os.getenv("NOTION_TOKEN")
+INBOX_DB_ID = os.getenv("INBOX_DB_ID")
 
 url = f"https://api.notion.com/v1/databases/{INBOX_DB_ID}/query"
 
