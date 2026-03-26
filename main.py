@@ -50,16 +50,14 @@ async def discord_webhook(request: dict):
 @app.post("/approve-send")
 async def approve_send(page_id: str, sender: str, draft_reply: str):
     # Send to Discord via webhook
-    payload = {
-        "content": draft_reply,
-        "username": "SideHustleOps Bot"
-    }
-    requests.post(DISCORD_WEBHOOK_URL, json=payload)
+    notion.pages.update(page_id=page_id, archived=False)
+
+    requests.post(DISCORD_WEBHOOK_URL, json={"content": draft_reply})
     
     # Update Notion status
     notion.pages.update(
         page_id=page_id,
-        properties={"Status": {"status": {"name": "Sent ✅"}}}
+        properties={"Status": {"status": {"name": "Sent"}}}
     )
     
     return {"status": "Sent ✅"}
