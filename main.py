@@ -63,7 +63,7 @@ async def approve_send(page_id: str, sender: str, draft_reply: str):
 async def ai_agent():
     new_leads = notion.databases.query(
         database_id=INBOX_DB_ID,
-        filter={"property": "Status", "select": {"equals": "New"}}
+        filter={"property": "Status", "status": {"equals": "New"}}
     )
     
     results = []
@@ -119,7 +119,7 @@ Generate reply:
             properties={
                 "Draft Reply": {"rich_text": [{"text": {"content": draft}}]},
                 "KB Links": {"url": kb_urls[0] if kb_urls else "https://notion.so/your-kb"},  # Link to KB
-                "Status": {"select": {"name": "Ready"}}
+                "Status": {"status": {"name": "Ready"}}
             }
         )
         results.append(f"AI replied to {name}")
