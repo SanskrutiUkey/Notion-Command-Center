@@ -4,7 +4,6 @@ from dotenv import load_dotenv
 import os
 import re
 import requests
-from openai import OpenAI
 
 load_dotenv()
 app = FastAPI()
@@ -13,8 +12,6 @@ notion = Client(auth=os.getenv("NOTION_TOKEN"))
 INBOX_DB_ID = os.getenv("INBOX_DB_ID")
 PRODUCT_KB_DB_ID = os.getenv("PRODUCT_KB_DB_ID")
 DISCORD_WEBHOOK_URL = os.getenv("DISCORD_WEBHOOK_URL")
-OPENAI_KEY = os.getenv("OPENAI_API_KEY")
-openai_client = OpenAI(api_key=OPENAI_KEY)
 
 @app.get("/")
 def root():
@@ -95,6 +92,9 @@ async def ai_agent():
         for kb in kb_search['results'][:3]:  # Top 3 matches
             kb_context.append(kb['properties']['Content']['rich_text'][0]['plain_text'])
         
+
+        from openai import OpenAI
+        openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
         # OpenAI generates reply
         prompt = f"""User asked: "{message}"
 Search Product KB for relevant info: {kb_context}
