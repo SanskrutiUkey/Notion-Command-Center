@@ -68,7 +68,17 @@ async def ai_agent():
     
     results = []
     for lead in new_leads['results']:
-        sender = lead['properties']['Sender']['title'][0]['plain_text']
+        sender_prop = lead['properties']['Sender']
+        if 'email' in sender_prop:
+            sender = sender_prop['email']
+            name = sender.split('@')[0].capitalize()
+        elif 'title' in sender_prop and sender_prop['title']:
+            sender = sender_prop['title'][0]['plain_text']
+            name = sender.split()[0].capitalize()
+        else:
+            sender = "user@example.com"
+            name = "User"
+
         import re
         name = re.search(r'^([^@]+)', sender).group(1).split()[0].capitalize()
         
@@ -89,12 +99,15 @@ async def ai_agent():
         )
         
         kb_context = []
-        for kb in kb_search['results'][:3]:  # Top 3 matches
-            kb_context.append(kb['properties']['Content']['rich_text'][0]['plain_text'])
+        for kb in kb_search['results'][:3]:
+            content_prop = kb['properties'].get('Content', {})
+            if content_prop.get('rich_text') and content_prop['rich_text']:
+                kb_context.append(content_prop['rich_text'][0]['plain_text'])
+            else:
+                kb_context.append("No content found")
         
-
         from openai import OpenAI
-        openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
+        openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"), base_url="https://openrouter.ai/api/v1")
         # OpenAI generates reply
         prompt = f"""User asked: "{message}"
 Search Product KB for relevant info: {kb_context}
@@ -118,7 +131,7 @@ Generate reply:
             page_id=lead['id'],
             properties={
                 "Draft Reply": {"rich_text": [{"text": {"content": draft}}]},
-                "KB Links": {"url": kb_urls[0] if kb_urls else "https://notion.so/your-kb"},  # Link to KB
+                "Kb Links": {"url": kb_urls[0] if kb_urls else "https://notion.so/your-kb"},  # Link to KB
                 "Status": {"status": {"name": "Ready"}}
             }
         )
