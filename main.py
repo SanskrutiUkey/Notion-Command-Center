@@ -89,11 +89,11 @@ async def ai_agent():
             database_id=PRODUCT_KB_DB_ID,
             filter={
                 "or": [
-                    {"property": "Tags", "multi_select": {"contains": "lead"}},
-                    {"property": "Tags", "multi_select": {"contains": "pricing"}}, 
-                    {"property": "Tags", "multi_select": {"contains": "setup"}},
-                    {"property": "Tags", "multi_select": {"contains": "features"}},
-                    {"property": "Tags", "multi_select": {"contains": "support"}}
+                    {"property": "Tags", "multi_select": {"contains": "Lead"}},
+                    {"property": "Tags", "multi_select": {"contains": "Pricing"}}, 
+                    {"property": "Tags", "multi_select": {"contains": "Setup"}},
+                    {"property": "Tags", "multi_select": {"contains": "Features"}},
+                    {"property": "Tags", "multi_select": {"contains": "Support"}}
                 ]
             }
         )
