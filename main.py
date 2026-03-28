@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 import os
 import re
 import requests
-
+from fastapi import Request
 load_dotenv()
 app = FastAPI()
 notion = Client(auth=os.getenv("NOTION_TOKEN"))
@@ -31,9 +31,10 @@ async def create_lead(sender: str, message: str):
     return {"Status": "Lead created ✅", "page_id": result["id"]}
 
 @app.post("/discord-webhook")
-async def discord_webhook(request: dict):
-    message = request.get("content", "")
-    sender = request.get("author", {}).get("username", "john@example.com")
+async def discord_webhook(request: Request):  # Add Request import
+    body = await request.json()
+    message = body.get("content", "")
+    sender = body.get("author", {}).get("username", "john@example.com")
     
     result = notion.pages.create(
         parent={"database_id": INBOX_DB_ID},
