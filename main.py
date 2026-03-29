@@ -60,7 +60,7 @@ async def approve_send(page_id: str, sender: str, draft_reply: str):
     
     return {"status": "Sent ✅"}
 
-@app.get("/ai-agent")
+@app.head("/ai-agent")
 async def ai_agent():
     new_leads = notion.databases.query(
         database_id=INBOX_DB_ID,
