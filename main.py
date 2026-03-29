@@ -45,9 +45,21 @@ async def discord_webhook(request: Request):  # Add Request import
     )
     return {"status": "✅ Row created", "page_id": result["id"]}
 
+from pydantic import BaseModel
+
+class ApproveRequest(BaseModel):
+    page_id: str
+    sender: str
+    draft_reply: str
+
+
 @app.post("/approve-send")
-async def approve_send(page_id: str, sender: str, draft_reply: str):
+async def approve_send(data: ApproveRequest):
     # Send to Discord via webhook
+    page_id = data.page_id
+    sender = data.sender
+    draft_reply = data.draft_reply
+    
     notion.pages.update(page_id=page_id, archived=False)
 
     requests.post(DISCORD_WEBHOOK_URL, json={"content": draft_reply})
