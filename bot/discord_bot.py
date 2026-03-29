@@ -1,6 +1,7 @@
 import discord
 import requests
 import os
+from urllib.parse import urlencode
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,8 +25,16 @@ async def on_message(message):
         return
     sender = str(message.author)
     msg_content = message.content
-    response = requests.post(f"{API_URL}/lead?sender={sender}&message={msg_content}")
-    print(f"Forwarded: {msg_content} - Response: {response.status_code}")
+
+    params = {"sender": sender, "message": msg_content}
+    url = f"{API_URL}/lead?{urlencode(params)}"
+
+    try:
+        response = requests.post(url, timeout=10)
+        print(f"Forwarded: {msg_content}")
+        print(f"Response: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"Error: {e}")
 
 
 bot.run(TOKEN)
