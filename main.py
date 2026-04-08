@@ -163,14 +163,12 @@ Generate reply:
 
     return {"processed": results}
 
+
 @app.get("/check-approved")
 def check_approved():
     response = notion.databases.query(
         database_id=INBOX_DB_ID,
-        filter={
-            "property": "Status",
-            "status": {"equals": "Sent"}
-        }
+        filter={"property": "Status", "status": {"equals": "Sent"}},
     )
 
     for page in response["results"]:
@@ -184,18 +182,20 @@ def check_approved():
         draft = rich_text[0]["plain_text"]
 
         # send to discord
-        requests.post(DISCORD_WEBHOOK_URL, json={"content": draft})
+        try:
+            discord_resp = requests.post(
+                DISCORD_WEBHOOK_URL, json={"content": draft}, timeout=10
+            )
+            print(f"Discord response: {discord_resp.status_code}")
+        except Exception as e:
+            print(f"Discord error: {e}")
 
-        # mark as Complete (important to avoid duplicate sending)
-        notion.pages.update(
-            page_id=page_id,
-            properties={
-                "Status": {"status": {"name": "Complete"}}
-            }
-        )
+        # Archive the page to prevent duplicate sending (since you only have 3 statuses)
+        notion.pages.update(page_id=page_id, archived=True)
 
     return {"status": "checked"}
-    
+
+
 if __name__ == "__main__":
     import uvicorn
 
