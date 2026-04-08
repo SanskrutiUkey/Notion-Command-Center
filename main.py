@@ -163,7 +163,39 @@ Generate reply:
 
     return {"processed": results}
 
+@app.get("/check-approved")
+def check_approved():
+    response = notion.databases.query(
+        database_id=INBOX_DB_ID,
+        filter={
+            "property": "Status",
+            "status": {"equals": "Sent"}
+        }
+    )
 
+    for page in response["results"]:
+        page_id = page["id"]
+
+        # safely get draft reply
+        rich_text = page["properties"]["Draft Reply"]["rich_text"]
+        if not rich_text:
+            continue
+
+        draft = rich_text[0]["plain_text"]
+
+        # send to discord
+        requests.post(DISCORD_WEBHOOK_URL, json={"content": draft})
+
+        # mark as Complete (important to avoid duplicate sending)
+        notion.pages.update(
+            page_id=page_id,
+            properties={
+                "Status": {"status": {"name": "Complete"}}
+            }
+        )
+
+    return {"status": "checked"}
+    
 if __name__ == "__main__":
     import uvicorn
 
