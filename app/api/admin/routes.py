@@ -41,9 +41,9 @@ def admin_dashboard(
     ).all()
 
     return templates.TemplateResponse(
+        request,
         "dashboard.html",
         {
-            "request": request,
             "tickets": tickets,
             "status": status,
             "current_user": current_user
@@ -61,9 +61,9 @@ def view_ticket(request: Request, ticket_id: int, db: Session = Depends(get_db),
         raise HTTPException(status_code=404, detail="Ticket not found")
 
     return templates.TemplateResponse(
+        request,
         "ticket_detail.html",
         {
-            "request": request,
             "ticket": ticket,
             "current_user": current_user
         }

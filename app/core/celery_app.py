@@ -20,6 +20,7 @@ celery.conf.redis_backend_use_ssl = {
     "ssl_cert_reqs": ssl.CERT_NONE
 }
 # Use solo pool on Windows to avoid billiard permission issues
-celery.conf.worker_pool = "solo"
+import platform
+celery.conf.worker_pool = "solo" if platform.system() == "Windows" else "prefork"
 
 celery.autodiscover_tasks(["app.core"])

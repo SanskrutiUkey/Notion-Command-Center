@@ -18,8 +18,8 @@ router = APIRouter(
 @router.get("/login")
 def login_page(request: Request):
     return templates.TemplateResponse(
-        name="login.html",
-        request=request,
+        request,
+        "login.html",
     )
 
 @router.post("/login")

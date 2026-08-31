@@ -61,7 +61,7 @@ async def get_reranking_service():
 def root(request: Request):
     from fastapi.templating import Jinja2Templates
     templates = Jinja2Templates(directory="templates")
-    return templates.TemplateResponse( request=request, name="login.html", context={} )
+    return templates.TemplateResponse(request, "login.html")
 
 @app.get("/health")
 def health():
